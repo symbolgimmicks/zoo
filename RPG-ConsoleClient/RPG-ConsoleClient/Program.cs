@@ -13,6 +13,8 @@ namespace RPG_ConsoleClient
             bool done = false;
             System.Timers.Timer titleScreenTimer = new System.Timers.Timer(5000);
             titleScreenTimer.Elapsed += TitleScreenTimer_Elapsed;
+
+            Tuple<bool, int> lastMainMenuChoice;
             do
             {
                 switch (GameState.Current())
@@ -21,9 +23,17 @@ namespace RPG_ConsoleClient
                         done = true;
                         break;
                     case GameState.Values.TitleScreen:
-                        Console.WriteLine("JJB RPG!");
-                        Console.Write("Press spacebar to continue");
-                        titleScreenTimer.Start()
+                        if (!titleScreenTimer.Enabled)
+                        {
+                            Console.WriteLine("JJB RPG!");
+                            Console.Write("Press spacebar to continue");
+                            titleScreenTimer.Start();
+                        }
+                        else
+                        {
+
+                        }
+
                         if (Console.KeyAvailable && Console.ReadKey().Key == System.ConsoleKey.Spacebar)
                         {
                             GameState.Set(GameState.Values.MainMenu);
@@ -31,7 +41,7 @@ namespace RPG_ConsoleClient
                         }
                         break;
                     case GameState.Values.MainMenu:
-                        int choice = ShowMainMenu();
+                        lastMainMenuChoice = ShowMainMenu();
                         break;
 
                 }
@@ -44,7 +54,7 @@ namespace RPG_ConsoleClient
             Console.Write(".");
         }
 
-        private static bool ShowMainMenu(ref GameState.Values gameState)
+        private static Tuple<bool, int> ShowMainMenu()
         {
             string[] Menu = new string[]
             {
@@ -67,12 +77,18 @@ namespace RPG_ConsoleClient
                     int val = Convert.ToInt32(line);
                     switch(val)
                     {
-                        case 1: gameState = GameState.Values.NewGame; return true;
-                        case 2: gameState = GameState.Values.LoadGame; return true;
-                        case 3: gameState = GameState.Values.Quit; return true;
+                        case 1:
+                            GameState.Set(GameState.Values.NewGame);
+                            break;
+                        case 2:
+                            GameState.Set(GameState.Values.LoadGame);
+                            break;
+                        case 3:
+                            GameState.Set(GameState.Values.Quit);
+                            break;
                     }
 
-                    return true;
+                    return new Tuple<bool, int>(true, val);
                 }
                 catch
                 {
